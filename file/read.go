@@ -1,42 +1,34 @@
-// Provides parsing and rendering of SVG images.
-// SVG files are parsed into an abstract representation,
-// which can then be consumed by painting drivers.
-// See for example oksvg/svgraster or oksvg/svgpdf .
-package parse
+package file
 
 import (
 	"encoding/xml"
-	"errors"
 	"io"
+	"os"
 
 	"github.com/reactivego/svg"
 	"golang.org/x/net/html/charset"
 )
 
-// SVG holds data from parsed SVGs.
-// See the `Draw` methods to use it.
-type SVG struct {
-	ViewBox      svg.Bounds
-	Titles       []string // Title elements collect here
-	Descriptions []string // Description elements collect here
-	Paths        []StyledPath
-
-	Width, Height string // top level width and height attributes
-
-	grads map[string]*svg.Gradient
-	defs  map[string][]definition
+// ReadFromFile reads the icon from the named file.
+// This only supports a sub-set of SVG, but this is enough to draw many icons.
+// The errMode determines if the icon ignores, errors out, or logs a warning
+// when it does not handle an element found in the icon file.
+func ReadFromFile(filename string, errMode ErrorMode) (*SVG, error) {
+	fin, errf := os.Open(filename)
+	if errf != nil {
+		return nil, errf
+	}
+	defer fin.Close()
+	return ReadFromStream(fin, errMode)
 }
 
-func NewSVG() *SVG {
-	return &SVG{defs: make(map[string][]definition), grads: make(map[string]*svg.Gradient)}
-}
-
-// ReadFromStream reads the Icon from the given io.Reader
-// This only supports a sub-set of SVG, but
-// is enough to draw many icons. errMode determines if the icon ignores, errors out, or logs a warning
+// ReadFromStream reads the Document from the given io.Reader
+// This only supports a sub-set of SVG, but is enough to draw many icons.
+// errMode determines if the icon ignores, errors out, or logs a warning
 // if it does not handle an element found in the icon file.
-func (doc *SVG) ReadFromStream(stream io.Reader, errMode svg.ErrorMode) error {
-	cursor := &svgCursor{styleStack: []PathStyle{DefaultStyle}, icon: doc}
+func ReadFromStream(stream io.Reader, errMode ErrorMode) (*SVG, error) {
+	doc := NewSVG()
+	cursor := &svgCursor{styleStack: []svg.PathStyle{svg.DefaultStyle}, icon: doc}
 	cursor.errorMode = errMode
 	decoder := xml.NewDecoder(stream)
 	decoder.CharsetReader = charset.NewReaderLabel
@@ -46,11 +38,11 @@ func (doc *SVG) ReadFromStream(stream io.Reader, errMode svg.ErrorMode) error {
 		if err != nil {
 			if err == io.EOF {
 				if !seenTag {
-					return errors.New("invalid svg xml icon")
+					return nil, ErrInvalidSvgXmlIcon
 				}
 				break
 			}
-			return err
+			return nil, err
 		}
 		// Inspect the type of the XML token
 		switch se := t.(type) {
@@ -60,11 +52,11 @@ func (doc *SVG) ReadFromStream(stream io.Reader, errMode svg.ErrorMode) error {
 			// and places it on top of the styleStack
 			err = cursor.pushStyle(se.Attr)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			err = cursor.readStartElement(se)
 			if err != nil {
-				return err
+				return nil, err
 			}
 		case xml.EndElement:
 			// pop style
@@ -72,7 +64,7 @@ func (doc *SVG) ReadFromStream(stream io.Reader, errMode svg.ErrorMode) error {
 			switch se.Name.Local {
 			case "g":
 				if cursor.inDefs {
-					cursor.currentDef = append(cursor.currentDef, definition{
+					cursor.currentDef = append(cursor.currentDef, svg.Definition{
 						Tag: "endg",
 					})
 				}
@@ -82,8 +74,8 @@ func (doc *SVG) ReadFromStream(stream io.Reader, errMode svg.ErrorMode) error {
 				cursor.inDescText = false
 			case "defs":
 				if len(cursor.currentDef) > 0 {
-					cursor.icon.defs[cursor.currentDef[0].ID] = cursor.currentDef
-					cursor.currentDef = make([]definition, 0)
+					cursor.icon.Defs[cursor.currentDef[0].ID] = cursor.currentDef
+					cursor.currentDef = make([]svg.Definition, 0)
 				}
 				cursor.inDefs = false
 			case "radialGradient", "linearGradient":
@@ -98,5 +90,5 @@ func (doc *SVG) ReadFromStream(stream io.Reader, errMode svg.ErrorMode) error {
 			}
 		}
 	}
-	return nil
+	return doc, nil
 }

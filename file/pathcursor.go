@@ -1,4 +1,4 @@
-package parse
+package file
 
 // this file implements the translation of an SVG2.0 path into a Path.
 
@@ -7,20 +7,21 @@ import (
 	"math"
 	"unicode"
 
-	"github.com/reactivego/svg"
 	"golang.org/x/image/math/fixed"
+
+	"github.com/reactivego/svg"
 )
 
 // pathCursor is used to parse SVG format path strings into a Path
 type pathCursor struct {
-	path                   Path
+	path                   svg.Path
 	placeX, placeY         float64
 	curX, curY             float64
 	cntlPtX, cntlPtY       float64
 	pathStartX, pathStartY float64
 	points                 []float64
 	lastKey                uint8
-	errorMode              svg.ErrorMode
+	errorMode              ErrorMode
 	inPath                 bool
 }
 
@@ -338,10 +339,10 @@ func (c *pathCursor) addSeg(segString string) error {
 			c.addArcFromA(c.points[i:])
 		}
 	default:
-		if c.errorMode == svg.StrictErrorMode {
+		if c.errorMode == StrictErrorMode {
 			return ErrCommandUnknown
 		}
-		if c.errorMode == svg.WarnErrorMode {
+		if c.errorMode == WarnErrorMode {
 			log.Println("Ignoring svg command " + string(k))
 		}
 	}
@@ -359,7 +360,7 @@ func (c *pathCursor) ellipseAt(cx, cy, rx, ry float64) {
 	c.path.Start(fixed.Point26_6{
 		X: fixed.Int26_6(c.placeX * 64),
 		Y: fixed.Int26_6(c.placeY * 64)})
-	c.placeX, c.placeY = c.path.addArc(c.points, cx, cy, c.placeX, c.placeY)
+	c.placeX, c.placeY = c.path.AddArc(c.points, cx, cy, c.placeX, c.placeY)
 	c.path.Stop(true)
 }
 
@@ -367,7 +368,7 @@ func (c *pathCursor) ellipseAt(cx, cy, rx, ry float64) {
 func (c *pathCursor) addArcFromA(points []float64) {
 	cx, cy := findEllipseCenter(&points[0], &points[1], points[2]*math.Pi/180, c.placeX,
 		c.placeY, points[5], points[6], points[4] == 0, points[3] == 0)
-	c.placeX, c.placeY = c.path.addArc(c.points, cx+c.curX, cy+c.curY, c.placeX+c.curX, c.placeY+c.curY)
+	c.placeX, c.placeY = c.path.AddArc(c.points, cx+c.curX, cy+c.curY, c.placeX+c.curX, c.placeY+c.curY)
 }
 
 // findEllipseCenter locates the center of the Ellipse if it exists. If it does not exist,

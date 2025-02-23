@@ -1,6 +1,10 @@
-package svg
+package driver
 
-import "golang.org/x/image/math/fixed"
+import (
+	"golang.org/x/image/math/fixed"
+
+	"github.com/reactivego/svg"
+)
 
 // Drawer knows how to do the actual draw operations
 // but doesn't need any SVG kwowledge
@@ -26,7 +30,7 @@ type Drawer interface {
 	Stop(closeLoop bool)
 
 	// Draw fills or strokes the accumulated path using the given color
-	Draw(color Pattern, opacity float64)
+	Draw(color svg.Pattern, opacity float64)
 }
 
 // DrawerNG is the interface for specifying paths and then filling and/or stroking them.
@@ -57,8 +61,8 @@ type DrawerNG interface {
 	Close()
 
 	// Fill fills the accumulated path using the given color
-	Fill(color Pattern, opacity float64)
+	Fill(color svg.Pattern, opacity float64)
 
 	// Stroke will stroke the accumulated path using the given color
-	Stroke(color Pattern, opacity float64)
+	Stroke(color svg.Pattern, opacity float64)
 }

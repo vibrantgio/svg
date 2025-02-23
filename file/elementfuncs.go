@@ -1,8 +1,7 @@
-package parse
+package file
 
 import (
 	"encoding/xml"
-	"errors"
 	"strings"
 
 	"github.com/reactivego/svg"
@@ -104,7 +103,7 @@ func rectF(c *svgCursor, attrs []xml.Attr) error {
 	if w == 0 || h == 0 {
 		return nil
 	}
-	c.path.addRoundRect(x+c.curX, y+c.curY, w+x+c.curX, h+y+c.curY, rx, ry, 0)
+	c.path.AddRoundRect(x+c.curX, y+c.curY, w+x+c.curX, h+y+c.curY, rx, ry, 0)
 	return nil
 }
 
@@ -172,7 +171,7 @@ func polylineF(c *svgCursor, attrs []xml.Attr) error {
 		case "points":
 			err = c.getPoints(attr.Value)
 			if len(c.points)%2 != 0 {
-				return errors.New("polygon has odd number of points")
+				return ErrPolygonHasOddNumberOfPoints
 			}
 		}
 		if err != nil {
@@ -246,7 +245,7 @@ func linearGradientF(c *svgCursor, attrs []xml.Attr) error {
 		case "id":
 			id := attr.Value
 			if len(id) >= 0 {
-				c.icon.grads[id] = c.grad
+				c.icon.Grads[id] = c.grad
 			} else {
 				return ErrZeroLengthID
 			}
@@ -266,7 +265,7 @@ func linearGradientF(c *svgCursor, attrs []xml.Attr) error {
 		}
 	}
 	// now we can resolve percentages
-	bbox := svg.Bounds{W: 1, H: 1} // default is ObjectBoundingBox
+	bbox := svg.ViewBox{W: 1, H: 1} // default is ObjectBoundingBox
 	if c.grad.Units == svg.UserSpaceOnUse {
 		bbox = c.grad.Bounds
 	}
@@ -302,7 +301,7 @@ func radialGradientF(c *svgCursor, attrs []xml.Attr) error {
 		case "id":
 			id := attr.Value
 			if len(id) >= 0 {
-				c.icon.grads[id] = c.grad
+				c.icon.Grads[id] = c.grad
 			} else {
 				return ErrZeroLengthID
 			}
@@ -335,7 +334,7 @@ func radialGradientF(c *svgCursor, attrs []xml.Attr) error {
 	}
 
 	// now we can resolve percentages
-	bbox := svg.Bounds{W: 1, H: 1} // default is ObjectBoundingBox
+	bbox := svg.ViewBox{W: 1, H: 1} // default is ObjectBoundingBox
 	if c.grad.Units == svg.UserSpaceOnUse {
 		bbox = c.grad.Bounds
 	}
@@ -376,7 +375,7 @@ func stopF(c *svgCursor, attrs []xml.Attr) error {
 		for _, attr := range attrs {
 			switch attr.Name.Local {
 			case "offset":
-				stop.Offset, err = readFraction(attr.Value)
+				stop.Offset, err = parseFraction(attr.Value)
 			case "stop-color":
 				// todo: add current color inherit
 				var c svg.Color
@@ -418,14 +417,14 @@ func useF(c *svgCursor, attrs []xml.Attr) error {
 		c.curX, c.curY = 0, 0
 	}()
 	if href == "" {
-		return errors.New("only use tags with href is supported")
+		return ErrOnlyUseTagsWithHrefIsSupported
 	}
 	if !strings.HasPrefix(href, "#") {
-		return errors.New("only the ID CSS selector is supported")
+		return ErrOnlyTheIdCssSelectorIsSupported
 	}
-	defs, ok := c.icon.defs[href[1:]]
+	defs, ok := c.icon.Defs[href[1:]]
 	if !ok {
-		return errors.New("href ID in use statement was not found in saved defs")
+		return ErrHrefIdInUseStatementWasNotFoundInSavedDef
 	}
 	for _, def := range defs {
 		if def.Tag == "endg" {
@@ -439,7 +438,7 @@ func useF(c *svgCursor, attrs []xml.Attr) error {
 		df, ok := elementFuncs[def.Tag]
 		if !ok {
 			errStr := "Cannot process svg element " + def.Tag
-			return c.handleError(errStr)
+			return HandleError(c.errorMode, errStr)
 		}
 		if err := df(c, def.Attrs); err != nil {
 			return err

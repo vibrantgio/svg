@@ -1,8 +1,8 @@
-package parse
+package file
 
 import "strings"
 
-func readFraction(v string) (f float64, err error) {
+func parseFraction(v string) (f float64, err error) {
 	v = strings.TrimSpace(v)
 	d := 1.0
 	if strings.HasSuffix(v, "%") {

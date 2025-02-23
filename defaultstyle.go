@@ -1,8 +1,8 @@
-package parse
+package svg
 
 import (
-	"github.com/reactivego/svg"
 	"github.com/reactivego/svg/matrix"
+	"golang.org/x/image/math/fixed"
 )
 
 // DefaultStyle sets the default PathStyle to fill black, winding rule,
@@ -12,11 +12,11 @@ var DefaultStyle = PathStyle{
 	LineOpacity:       1.0,
 	LineWidth:         2.0,
 	UseNonZeroWinding: true,
-	Join: svg.JoinOptions{
-		MiterLimit:   fToFixed(4.),
-		LineJoin:     svg.Bevel,
-		TrailLineCap: svg.ButtCap,
+	Join: JoinOptions{
+		MiterLimit:   fixed.Int26_6(4. * 64),
+		LineJoin:     Bevel,
+		TrailLineCap: ButtCap,
 	},
-	FillColor: svg.PlainColor{A: 255},
+	FillColor: PlainColor{A: 255},
 	Transform: matrix.Identity,
 }

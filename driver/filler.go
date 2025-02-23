@@ -1,4 +1,4 @@
-package svg
+package driver
 
 type Filler interface {
 	Drawer

@@ -11,7 +11,7 @@ import (
 type Gradient struct {
 	Direction GradDirection
 	Stops     []GradStop
-	Bounds    Bounds
+	Bounds    ViewBox
 	Matrix    matrix.Matrix2D
 	Spread    SpreadMethod
 	Units     GradUnits

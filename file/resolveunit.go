@@ -1,4 +1,4 @@
-package parse
+package file
 
 import (
 	"math"
@@ -9,7 +9,7 @@ import (
 // resolveUnit converts a length with a unit into its value in 'px' percentage
 // are supported, and refer to the viewBox `asPerc` is only applied when `s`
 // contains a percentage.
-func resolveUnit(viewBox svg.Bounds, s string, asPerc percentageReference) (float64, error) {
+func resolveUnit(viewBox svg.ViewBox, s string, asPerc percentageReference) (float64, error) {
 	value, isPercentage, err := parseUnit(s)
 	if err != nil {
 		return 0, err

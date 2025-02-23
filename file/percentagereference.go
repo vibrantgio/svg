@@ -1,4 +1,4 @@
-package parse
+package file
 
 type percentageReference uint8
 

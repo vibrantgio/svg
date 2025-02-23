@@ -1,4 +1,4 @@
-package parse
+package svg
 
 // StyledPath binds a style to a path
 type StyledPath struct {

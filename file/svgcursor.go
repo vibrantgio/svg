@@ -1,12 +1,10 @@
-package parse
+package file
 
 import (
-	"fmt"
 	"image/color"
 	"strings"
 
 	"encoding/xml"
-	"errors"
 	"log"
 	"math"
 
@@ -21,38 +19,16 @@ import (
 type svgCursor struct {
 	pathCursor
 	icon                                    *SVG
-	styleStack                              []PathStyle
+	styleStack                              []svg.PathStyle
 	grad                                    *svg.Gradient
 	inTitleText, inDescText, inGrad, inDefs bool
-	currentDef                              []definition
-}
-
-// definition is used to store what's given in a def tag
-type definition struct {
-	ID, Tag string
-	Attrs   []xml.Attr
+	currentDef                              []svg.Definition
 }
 
 // parseUnit converts a length with a unit into its value in 'px'
 // percentage are supported, and refer to the current ViewBox
 func (c *svgCursor) parseUnit(s string, asPerc percentageReference) (float64, error) {
 	return resolveUnit(c.icon.ViewBox, s, asPerc)
-}
-
-func fToFixed(f float64) fixed.Int26_6 {
-	return fixed.Int26_6(f * 64)
-}
-
-// treat the error according to the errorMode
-func (c *svgCursor) handleError(originFmt string, args ...interface{}) error {
-	formatted := fmt.Sprintf(originFmt, args...)
-	switch c.errorMode {
-	case svg.StrictErrorMode:
-		return errors.New(formatted)
-	case svg.WarnErrorMode:
-		log.Println(formatted) // then return nil
-	}
-	return nil
 }
 
 func (c *svgCursor) readTransformAttr(m1 matrix.Matrix2D, k string) (matrix.Matrix2D, error) {
@@ -142,7 +118,7 @@ func (c *svgCursor) parseTransform(v string) (matrix.Matrix2D, error) {
 	return m1, nil
 }
 
-func (c *svgCursor) readStyleAttr(curStyle *PathStyle, k, v string) error {
+func (c *svgCursor) readStyleAttr(curStyle *svg.PathStyle, k, v string) error {
 	switch k {
 	case "fill":
 		gradient, ok := c.readGradURL(v, curStyle.FillColor)
@@ -175,7 +151,7 @@ func (c *svgCursor) readStyleAttr(curStyle *PathStyle, k, v string) error {
 		case "quadratic":
 			curStyle.Join.LineGap = svg.QuadraticGap
 		default:
-			return c.handleError("unsupported value '%s' for <stroke-linegap>", v)
+			return HandleError(c.errorMode, "unsupported value '%s' for <stroke-linegap>", v)
 		}
 	case "stroke-leadlinecap":
 		switch v {
@@ -190,7 +166,7 @@ func (c *svgCursor) readStyleAttr(curStyle *PathStyle, k, v string) error {
 		case "quadratic":
 			curStyle.Join.LeadLineCap = svg.QuadraticCap
 		default:
-			return c.handleError("unsupported value '%s' for <stroke-leadlinecap>", v)
+			return HandleError(c.errorMode, "unsupported value '%s' for <stroke-leadlinecap>", v)
 		}
 	case "stroke-linecap":
 		switch v {
@@ -205,7 +181,7 @@ func (c *svgCursor) readStyleAttr(curStyle *PathStyle, k, v string) error {
 		case "quadratic":
 			curStyle.Join.TrailLineCap = svg.QuadraticCap
 		default:
-			return c.handleError("unsupported value '%s' for <stroke-linecap>", v)
+			return HandleError(c.errorMode, "unsupported value '%s' for <stroke-linecap>", v)
 		}
 	case "stroke-linejoin":
 		switch v {
@@ -222,14 +198,14 @@ func (c *svgCursor) readStyleAttr(curStyle *PathStyle, k, v string) error {
 		case "bevel":
 			curStyle.Join.LineJoin = svg.Bevel
 		default:
-			return c.handleError("unsupported value '%s' for <stroke-linejoin>", v)
+			return HandleError(c.errorMode, "unsupported value '%s' for <stroke-linejoin>", v)
 		}
 	case "stroke-miterlimit":
 		mLimit, err := parseBasicFloat(v)
 		if err != nil {
 			return err
 		}
-		curStyle.Join.MiterLimit = fToFixed(mLimit)
+		curStyle.Join.MiterLimit = fixed.Int26_6(mLimit * 64)
 	case "stroke-width":
 		width, err := c.parseUnit(v, widthPercentage)
 		if err != nil {
@@ -329,10 +305,10 @@ func (c *svgCursor) readStartElement(se xml.StartElement) (err error) {
 			}
 		}
 		if ID != "" && len(c.currentDef) > 0 {
-			c.icon.defs[c.currentDef[0].ID] = c.currentDef
-			c.currentDef = make([]definition, 0)
+			c.icon.Defs[c.currentDef[0].ID] = c.currentDef
+			c.currentDef = make([]svg.Definition, 0)
 		}
-		c.currentDef = append(c.currentDef, definition{
+		c.currentDef = append(c.currentDef, svg.Definition{
 			ID:    ID,
 			Tag:   se.Name.Local,
 			Attrs: se.Attr,
@@ -343,9 +319,9 @@ func (c *svgCursor) readStartElement(se xml.StartElement) (err error) {
 	if !ok {
 		errStr := "Cannot process svg element " + se.Name.Local
 		switch c.errorMode {
-		case svg.StrictErrorMode:
-			return errors.New(errStr)
-		case svg.WarnErrorMode:
+		case StrictErrorMode:
+			return Error(errStr)
+		case WarnErrorMode:
 			log.Println(errStr)
 		}
 		return nil
@@ -354,9 +330,9 @@ func (c *svgCursor) readStartElement(se xml.StartElement) (err error) {
 
 	if len(c.path) > 0 {
 		//The cursor parsed a path from the xml element
-		pathCopy := append(Path{}, c.path...)
+		pathCopy := append(svg.Path{}, c.path...)
 		c.icon.Paths = append(c.icon.Paths,
-			StyledPath{Path: pathCopy, Style: c.styleStack[len(c.styleStack)-1]})
+			svg.StyledPath{Path: pathCopy, Style: c.styleStack[len(c.styleStack)-1]})
 		c.path = c.path[:0]
 	}
 	return
@@ -371,7 +347,7 @@ func (c *svgCursor) readGradURL(v string, defaultColor svg.Pattern) (grad svg.Gr
 		urlStr := strings.TrimSpace(v[4 : len(v)-1])
 		if strings.HasPrefix(urlStr, "#") {
 			var g *svg.Gradient
-			g, ok = c.icon.grads[urlStr[1:]]
+			g, ok = c.icon.Grads[urlStr[1:]]
 			if ok {
 				grad = localizeGradIfStopClrNil(g, defaultColor)
 			}

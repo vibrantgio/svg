@@ -1,18 +1,23 @@
 package svg
 
-import "golang.org/x/image/math/fixed"
+import (
+	"github.com/reactivego/svg/matrix"
+	"golang.org/x/image/math/fixed"
+)
 
-type Stroker interface {
-	Drawer
+// PathStyle holds the state of the SVG style
+type PathStyle struct {
+	FillOpacity       float64
+	LineOpacity       float64
+	LineWidth         float64
+	UseNonZeroWinding bool
 
-	// Parametrize the stroking style for the current path
-	SetStrokeOptions(options StrokeOptions)
-}
-
-type StrokeOptions struct {
-	LineWidth fixed.Int26_6 // width of the line
-	Dash      DashOptions
 	Join      JoinOptions
+	Dash      DashOptions
+	FillColor Pattern // either PlainColor or Gradient
+	LineColor Pattern // either PlainColor or Gradient
+
+	Transform matrix.Matrix2D // current transform
 }
 
 type DashOptions struct {

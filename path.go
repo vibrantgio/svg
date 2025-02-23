@@ -1,4 +1,4 @@
-package parse
+package svg
 
 import (
 	"math"
@@ -165,7 +165,7 @@ func roundGap(p *matrixAdder, a, tNorm, lNorm fixed.Point26_6) {
 // around the center by rot degrees with rounded corners of radius
 // rx in the x axis and ry in the y axis. gf specifes the shape of the
 // filleting function.
-func (p *Path) addRoundRect(minX, minY, maxX, maxY, rx, ry, rot float64) {
+func (p *Path) AddRoundRect(minX, minY, maxX, maxY, rx, ry, rot float64) {
 	if rx <= 0 || ry <= 0 {
 		p.addRect(minX, minY, maxX, maxY, rot)
 		return
@@ -201,7 +201,7 @@ func (p *Path) addRoundRect(minX, minY, maxX, maxY, rx, ry, rot float64) {
 }
 
 // addArc adds an arc to the adder p
-func (p *Path) addArc(points []float64, cx, cy, px, py float64) (lx, ly float64) {
+func (p *Path) AddArc(points []float64, cx, cy, px, py float64) (lx, ly float64) {
 	rotX := points[2] * math.Pi / 180 // Convert degress to radians
 	largeArc := points[3] != 0
 	sweep := points[4] != 0
