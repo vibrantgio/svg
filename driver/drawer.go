@@ -3,7 +3,7 @@ package driver
 import (
 	"golang.org/x/image/math/fixed"
 
-	"github.com/reactivego/svg"
+	"github.com/vibrantgio/svg"
 )
 
 // Drawer knows how to do the actual draw operations

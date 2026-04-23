@@ -4,7 +4,7 @@ import (
 	"math"
 	"strings"
 
-	"github.com/reactivego/svg/matrix"
+	"github.com/vibrantgio/svg/matrix"
 	"golang.org/x/image/math/fixed"
 )
 

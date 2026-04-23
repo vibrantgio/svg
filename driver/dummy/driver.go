@@ -5,8 +5,8 @@ import (
 
 	"golang.org/x/image/math/fixed"
 
-	"github.com/reactivego/svg"
-	"github.com/reactivego/svg/driver"
+	"github.com/vibrantgio/svg"
+	"github.com/vibrantgio/svg/driver"
 )
 
 func NewDriver() driver.Driver {

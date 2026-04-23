@@ -1,13 +1,46 @@
 package driver
 
 import (
-	"github.com/reactivego/svg"
-	"github.com/reactivego/svg/matrix"
 	"golang.org/x/image/math/fixed"
+
+	"github.com/vibrantgio/svg"
+	"github.com/vibrantgio/svg/matrix"
 )
 
-// DrawTransformed draws the compiled SvgPath into the driver while applying transform t.
-func DrawTransformed(d Driver, paths []svg.StyledPath, t matrix.Matrix2D, opacity float64) {
+// Draw the compiled SVG icon into the driver `d`.
+// `opacity` is composed (multiplied) with the eventual
+// <stroke-opacity> and <fill-opacity> style attributes.
+// All elements should be contained by the ViewBox
+// rectangle of the Icon: see `SetTarget` method.
+// This will then draw the compiled SvgPath into the driver
+// while applying transform t.
+func Draw(d Driver, i *svg.Icon, opacity float64) {
+	DrawOperationTransformed := func(d Drawer, op svg.Operation, M matrix.Matrix2D) {
+		switch op := op.(type) {
+		// starts a new path at the given point.
+		case svg.OpMoveTo:
+			d.Stop(false) // implicit close if currently in path.
+			// transform the operation `op` by applying `M`
+			d.Start(M.TFixed(fixed.Point26_6(op)))
+		// draw a line
+		case svg.OpLineTo:
+			// transform the operation `op` by applying `M`
+			d.Line(M.TFixed(fixed.Point26_6(op)))
+		// draw a quadratic bezier curve
+		case svg.OpQuadTo:
+			// transform the operation `op` by applying `M`
+			b, c := M.TFixed(op[0]), M.TFixed(op[1])
+			d.QuadBezier(b, c)
+		// draw a cubic bezier curve
+		case svg.OpCubicTo:
+			// transform the operation `op` by applying `M`
+			b, c, d_ := M.TFixed(op[0]), M.TFixed(op[1]), M.TFixed(op[2])
+			d.CubeBezier(b, c, d_)
+		case svg.OpClose:
+			d.Stop(true)
+		}
+	}
+	paths, t := i.Paths, i.Transform
 	for _, path := range paths {
 		m := path.Style.Transform
 		path.Style.Transform = t.Mult(m)
@@ -63,31 +96,5 @@ func DrawTransformed(d Driver, paths []svg.StyledPath, t matrix.Matrix2D, opacit
 
 		// Restore untransformed matrix
 		path.Style.Transform = m
-	}
-}
-
-func DrawOperationTransformed(d Drawer, op svg.Operation, M matrix.Matrix2D) {
-	switch op := op.(type) {
-	// starts a new path at the given point.
-	case svg.OpMoveTo:
-		d.Stop(false) // implicit close if currently in path.
-		// transform the operation `op` by applying `M`
-		d.Start(M.TFixed(fixed.Point26_6(op)))
-	// draw a line
-	case svg.OpLineTo:
-		// transform the operation `op` by applying `M`
-		d.Line(M.TFixed(fixed.Point26_6(op)))
-	// draw a quadratic bezier curve
-	case svg.OpQuadTo:
-		// transform the operation `op` by applying `M`
-		b, c := M.TFixed(op[0]), M.TFixed(op[1])
-		d.QuadBezier(b, c)
-	// draw a cubic bezier curve
-	case svg.OpCubicTo:
-		// transform the operation `op` by applying `M`
-		b, c, d_ := M.TFixed(op[0]), M.TFixed(op[1]), M.TFixed(op[2])
-		d.CubeBezier(b, c, d_)
-	case svg.OpClose:
-		d.Stop(true)
 	}
 }
