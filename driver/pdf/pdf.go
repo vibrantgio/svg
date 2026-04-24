@@ -13,43 +13,26 @@ import (
 
 // assert interface conformance
 var (
-	_ driver.Driver  = Renderer{}
-	_ driver.Filler  = (*filler)(nil)
-	_ driver.Stroker = (*stroker)(nil)
-	_ driver.Stroker = (*patherStroker)(nil)
+	_ driver.DrawerNG       = (*Renderer)(nil)
+	_ driver.FillAndStroker = (*Renderer)(nil)
 )
 
+// Renderer is a DrawerNG that writes SVG operations into a PDF content
+// stream. It also implements FillAndStroker so that combined fill+stroke
+// paths use PDF's native B operator (and emit the path only once).
 type Renderer struct {
-	pdf                 *contentstream.GraphicStream
+	pather
 	fillOpacityStates   map[float64]*model.GraphicState
 	strokeOpacityStates map[float64]*model.GraphicState
+	useNonZeroWinding   bool
 }
 
-// implements the common path commands,
-// shared by the filler and the stroker
+// pather writes path-construction operators into the content stream and
+// keeps the bounding box up-to-date, which is needed when painting
+// gradients defined in object-bounding-box units.
 type pather struct {
 	pdf         *contentstream.GraphicStream
 	boundingBox BoundingBox
-}
-
-// implements the filling operation
-type filler struct {
-	pather
-	useNonZeroWinding bool
-	fillOpacityStates map[float64]*model.GraphicState
-}
-
-// implements the stroking operation, while
-// also writing the path
-type patherStroker struct {
-	pather
-	strokeOpacityStates map[float64]*model.GraphicState
-}
-
-// only stroke the current path, established by
-// the filler
-type stroker struct {
-	patherStroker
 }
 
 func saveApperanceToFile(ap *contentstream.GraphicStream, filename string) error {
@@ -70,8 +53,6 @@ func RenderSVGIconToPDF(icon io.Reader, pdfName string) error {
 		return err
 	}
 	ap := contentstream.NewGraphicStream(model.Rectangle{Urx: 595.28, Ury: 841.89})
-	// pdf.TransformBegin()
-	// pdf.TransformScale(10000/parsedIcon.ViewBox.W, 10000/parsedIcon.ViewBox.H, 0, 0)
 	renderer := NewRenderer(&ap)
 	ap.Ops(
 		contentstream.OpSave{},
@@ -85,25 +66,12 @@ func RenderSVGIconToPDF(icon io.Reader, pdfName string) error {
 
 // NewRenderer return a renderer which will
 // write to the given `pdf`.
-func NewRenderer(cs *contentstream.GraphicStream) Renderer {
-	return Renderer{
-		pdf:                 cs,
+func NewRenderer(cs *contentstream.GraphicStream) *Renderer {
+	return &Renderer{
+		pather:              pather{pdf: cs},
 		fillOpacityStates:   make(map[float64]*model.GraphicState),
 		strokeOpacityStates: make(map[float64]*model.GraphicState),
 	}
-}
-
-func (r Renderer) SetupDrawers(willFill, willDraw bool) (f driver.Filler, s driver.Stroker) {
-	switch {
-	case willFill && willDraw:
-		s = &stroker{patherStroker: patherStroker{pather: pather{pdf: r.pdf}, strokeOpacityStates: r.strokeOpacityStates}}
-		fallthrough
-	case willFill:
-		f = &filler{pather: pather{pdf: r.pdf}, fillOpacityStates: r.fillOpacityStates}
-	case willDraw:
-		s = &patherStroker{pather: pather{pdf: r.pdf}, strokeOpacityStates: r.strokeOpacityStates}
-	}
-	return
 }
 
 func fixedTof(a fixed.Point26_6) (model.Fl, model.Fl) {
@@ -145,43 +113,28 @@ func (p *pather) CubeBezier(b fixed.Point26_6, c fixed.Point26_6, d fixed.Point2
 	p.boundingBox.CubeBezier(b, c, d)
 }
 
+// Stop emits a close-path operator if closeLoop is true.
+// Used by the bounding-box tests; Renderer uses Close instead.
 func (p *pather) Stop(closeLoop bool) {
 	if closeLoop {
 		p.pdf.Ops(contentstream.OpClosePath{})
 	}
 }
 
-// TODO: support gradient
-func (f filler) Draw(color svg.Pattern, opacity float64) {
-	switch color := color.(type) {
-	case svg.PlainColor:
-		f.pdf.SetColorFill(color)
-		opacity *= float64(color.A) / 255.
-		// cache the opacity states
-		gs, ok := f.fillOpacityStates[opacity]
-		if !ok {
-			gs = &model.GraphicState{Ca: model.ObjFloat(opacity), BM: []model.Name{"Normal"}}
-			f.fillOpacityStates[opacity] = gs
-		}
-		name := f.pdf.AddExtGState(gs)
-		f.pdf.Ops(contentstream.OpSetExtGState{Dict: name})
-	case svg.Gradient:
-		// mat := color.ApplyPathExtent(f.boundingBox.BBox)
-
-	}
-
-	if f.useNonZeroWinding {
-		f.pdf.Ops(contentstream.OpFill{})
-	} else {
-		f.pdf.Ops(contentstream.OpEOFill{})
-	}
+func (r *Renderer) Clear() {
+	r.pather.Clear()
+	r.useNonZeroWinding = true
 }
 
-func (f *filler) SetWinding(useNonZeroWinding bool) {
-	f.useNonZeroWinding = useNonZeroWinding
+func (r *Renderer) Close() {
+	r.pdf.Ops(contentstream.OpClosePath{})
 }
 
-func (f *patherStroker) SetStrokeOptions(options driver.StrokeOptions) {
+func (r *Renderer) SetWinding(useNonZeroWinding bool) {
+	r.useNonZeroWinding = useNonZeroWinding
+}
+
+func (r *Renderer) SetStrokeOptions(options driver.StrokeOptions) {
 	var capStyle, joinStyle uint8
 	switch options.Join.TrailLineCap {
 	case svg.ButtCap:
@@ -204,7 +157,7 @@ func (f *patherStroker) SetStrokeOptions(options driver.StrokeOptions) {
 	for i, v := range options.Dash.Dash {
 		dash[i] = model.Fl(v)
 	}
-	f.pdf.Ops(
+	r.pdf.Ops(
 		contentstream.OpSetDash{Dash: model.DashPattern{
 			Array: dash,
 			Phase: model.Fl(options.Dash.DashOffset),
@@ -216,34 +169,66 @@ func (f *patherStroker) SetStrokeOptions(options driver.StrokeOptions) {
 	)
 }
 
+// applyFillColor sets the fill colour and opacity graphic state for the
+// next paint operator. Returns the effective opacity (already multiplied
+// into the alpha graphic state). Gradients are not yet supported.
 // TODO: support gradient
-func (f patherStroker) Draw(color svg.Pattern, opacity float64) {
+func (r *Renderer) applyFillColor(color svg.Pattern, opacity float64) {
 	switch color := color.(type) {
 	case svg.PlainColor:
-		f.pdf.SetColorStroke(color)
+		r.pdf.SetColorFill(color)
 		opacity *= float64(color.A) / 255.
-		// cache the opacity states
-		gs, ok := f.strokeOpacityStates[opacity]
+		gs, ok := r.fillOpacityStates[opacity]
 		if !ok {
-			gs = &model.GraphicState{CA: model.ObjFloat(opacity), BM: []model.Name{"Normal"}}
-			f.strokeOpacityStates[opacity] = gs
+			gs = &model.GraphicState{Ca: model.ObjFloat(opacity), BM: []model.Name{"Normal"}}
+			r.fillOpacityStates[opacity] = gs
 		}
-		name := f.pdf.AddExtGState(gs)
-		f.pdf.Ops(contentstream.OpSetExtGState{Dict: name})
+		name := r.pdf.AddExtGState(gs)
+		r.pdf.Ops(contentstream.OpSetExtGState{Dict: name})
+	case svg.Gradient:
+		// mat := color.ApplyPathExtent(r.boundingBox.BBox)
 	}
-	f.pdf.Ops(contentstream.OpStroke{})
 }
 
-// the stroker doesnt write the path again
+// TODO: support gradient
+func (r *Renderer) applyStrokeColor(color svg.Pattern, opacity float64) {
+	switch color := color.(type) {
+	case svg.PlainColor:
+		r.pdf.SetColorStroke(color)
+		opacity *= float64(color.A) / 255.
+		gs, ok := r.strokeOpacityStates[opacity]
+		if !ok {
+			gs = &model.GraphicState{CA: model.ObjFloat(opacity), BM: []model.Name{"Normal"}}
+			r.strokeOpacityStates[opacity] = gs
+		}
+		name := r.pdf.AddExtGState(gs)
+		r.pdf.Ops(contentstream.OpSetExtGState{Dict: name})
+	}
+}
 
-func (p stroker) Clear() {}
+func (r *Renderer) Fill(color svg.Pattern, opacity float64) {
+	r.applyFillColor(color, opacity)
+	if r.useNonZeroWinding {
+		r.pdf.Ops(contentstream.OpFill{})
+	} else {
+		r.pdf.Ops(contentstream.OpEOFill{})
+	}
+}
 
-func (p stroker) Start(a fixed.Point26_6) {}
+func (r *Renderer) Stroke(color svg.Pattern, opacity float64) {
+	r.applyStrokeColor(color, opacity)
+	r.pdf.Ops(contentstream.OpStroke{})
+}
 
-func (p stroker) Line(b fixed.Point26_6) {}
-
-func (p stroker) QuadBezier(b fixed.Point26_6, c fixed.Point26_6) {}
-
-func (p stroker) CubeBezier(b fixed.Point26_6, c fixed.Point26_6, d fixed.Point26_6) {}
-
-func (p stroker) Stop(closeLoop bool) {}
+// FillAndStroke paints the current path with PDF's B operator (or B* for
+// the even-odd rule), avoiding a second emission of the path ops.
+func (r *Renderer) FillAndStroke(fillCol svg.Pattern, fillOp float64,
+	strokeCol svg.Pattern, strokeOp float64) {
+	r.applyFillColor(fillCol, fillOp)
+	r.applyStrokeColor(strokeCol, strokeOp)
+	if r.useNonZeroWinding {
+		r.pdf.Ops(contentstream.OpFillStroke{})
+	} else {
+		r.pdf.Ops(contentstream.OpEOFillStroke{})
+	}
+}

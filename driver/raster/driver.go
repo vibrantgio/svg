@@ -6,6 +6,8 @@ import (
 	"image"
 	"io"
 
+	"golang.org/x/image/math/fixed"
+
 	"github.com/vibrantgio/svg"
 	"github.com/vibrantgio/svg/driver"
 	"github.com/vibrantgio/svg/parser"
@@ -14,38 +16,96 @@ import (
 )
 
 // assert interface conformance
-var (
-	_ driver.Driver  = Driver{}
-	_ driver.Filler  = filler{}
-	_ driver.Stroker = stroker{}
-)
+var _ driver.DrawerNG = (*Driver)(nil)
 
+// Driver is a DrawerNG that rasterises into a rasterx scanner.
+// Path ops are buffered and replayed into the rasterx Filler on Fill and
+// into the rasterx Dasher on Stroke, since each consumes its own path state.
 type Driver struct {
 	dasher *rasterx.Dasher
-}
-
-type filler struct {
-	*rasterx.Filler
-}
-
-type stroker struct {
-	*rasterx.Dasher
+	ops    []svg.Operation
 }
 
 // NewDriver returns a renderer with default values,
 // which will raster into `scanner`.
-func NewDriver(width, height int, scanner rasterx.Scanner) Driver {
-	return Driver{dasher: rasterx.NewDasher(width, height, scanner)}
+func NewDriver(width, height int, scanner rasterx.Scanner) *Driver {
+	return &Driver{dasher: rasterx.NewDasher(width, height, scanner)}
 }
 
-func (rd Driver) SetupDrawers(willFill, willStroke bool) (f driver.Filler, s driver.Stroker) {
-	if willFill {
-		f = filler{Filler: &rd.dasher.Filler}
+func (d *Driver) Clear() {
+	d.ops = d.ops[:0]
+}
+
+// SetWinding forwards the rule to the rasterx scanner. Note that the
+// default scanner (rasterx.ScannerGV) does not support the even-odd rule
+// and treats this as a no-op; scanFT-style scanners honour it.
+func (d *Driver) SetWinding(useNonZeroWinding bool) {
+	d.dasher.Scanner.SetWinding(useNonZeroWinding)
+}
+
+func (d *Driver) SetStrokeOptions(options driver.StrokeOptions) {
+	d.dasher.SetStroke(
+		options.LineWidth, options.Join.MiterLimit, capToFunc[options.Join.LeadLineCap],
+		capToFunc[options.Join.TrailLineCap], gapToFunc[options.Join.LineGap],
+		joinToJoin[options.Join.LineJoin], options.Dash.Dash, options.Dash.DashOffset,
+	)
+}
+
+func (d *Driver) Start(a fixed.Point26_6)              { d.ops = append(d.ops, svg.OpMoveTo(a)) }
+func (d *Driver) Line(b fixed.Point26_6)               { d.ops = append(d.ops, svg.OpLineTo(b)) }
+func (d *Driver) QuadBezier(b, c fixed.Point26_6)      { d.ops = append(d.ops, svg.OpQuadTo{b, c}) }
+func (d *Driver) CubeBezier(b, c, e fixed.Point26_6)   { d.ops = append(d.ops, svg.OpCubicTo{b, c, e}) }
+func (d *Driver) Close()                               { d.ops = append(d.ops, svg.OpClose{}) }
+
+// pather is the subset of rasterx.Filler / rasterx.Dasher used when replaying
+// buffered path ops.
+type pather interface {
+	Start(a fixed.Point26_6)
+	Line(b fixed.Point26_6)
+	QuadBezier(b, c fixed.Point26_6)
+	CubeBezier(b, c, d fixed.Point26_6)
+	Stop(isClosed bool)
+	Clear()
+}
+
+func (d *Driver) replay(p pather) {
+	p.Clear()
+	started := false
+	for _, op := range d.ops {
+		switch o := op.(type) {
+		case svg.OpMoveTo:
+			if started {
+				p.Stop(false)
+			}
+			p.Start(fixed.Point26_6(o))
+			started = true
+		case svg.OpLineTo:
+			p.Line(fixed.Point26_6(o))
+		case svg.OpQuadTo:
+			p.QuadBezier(o[0], o[1])
+		case svg.OpCubicTo:
+			p.CubeBezier(o[0], o[1], o[2])
+		case svg.OpClose:
+			p.Stop(true)
+			started = false
+		}
 	}
-	if willStroke {
-		s = stroker{Dasher: rd.dasher}
+	if started {
+		p.Stop(false)
 	}
-	return f, s
+}
+
+func (d *Driver) Fill(color svg.Pattern, opacity float64) {
+	f := &d.dasher.Filler
+	d.replay(f)
+	setColorFromPattern(color, opacity, f.Scanner)
+	f.Draw()
+}
+
+func (d *Driver) Stroke(color svg.Pattern, opacity float64) {
+	d.replay(d.dasher)
+	setColorFromPattern(color, opacity, d.dasher.Scanner)
+	d.dasher.Draw()
 }
 
 // RasterSVGIconToImage uses a default scanner rasterx.ScannerGV instance to renderer the
@@ -108,16 +168,6 @@ func setColorFromPattern(color svg.Pattern, opacity float64, scanner rasterx.Sca
 	}
 }
 
-func (f filler) Draw(color svg.Pattern, opacity float64) {
-	setColorFromPattern(color, opacity, f.Scanner)
-	f.Filler.Draw()
-}
-
-func (s stroker) Draw(color svg.Pattern, opacity float64) {
-	setColorFromPattern(color, opacity, s.Scanner)
-	s.Dasher.Draw()
-}
-
 var (
 	joinToJoin = [...]rasterx.JoinMode{
 		svg.Round:     rasterx.Round,
@@ -143,11 +193,3 @@ var (
 		svg.QuadraticGap: rasterx.QuadraticGap,
 	}
 )
-
-func (s stroker) SetStrokeOptions(options driver.StrokeOptions) {
-	s.SetStroke(
-		options.LineWidth, options.Join.MiterLimit, capToFunc[options.Join.LeadLineCap],
-		capToFunc[options.Join.TrailLineCap], gapToFunc[options.Join.LineGap],
-		joinToJoin[options.Join.LineJoin], options.Dash.Dash, options.Dash.DashOffset,
-	)
-}
