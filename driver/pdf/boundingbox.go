@@ -7,7 +7,7 @@ import (
 	"golang.org/x/image/math/fixed"
 )
 
-// compute the bouding box of a path, needed when using gradient with objectBoudingBox
+// compute the bounding box of a path, needed when using gradient with objectBoundingBox
 
 type line [2]fixed.Point26_6
 
