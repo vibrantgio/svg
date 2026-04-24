@@ -1,6 +1,6 @@
 module github.com/vibrantgio/svg
 
-go 1.20
+go 1.22
 
 require (
 	github.com/benoitkugler/pdf v0.0.14
