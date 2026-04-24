@@ -20,7 +20,7 @@ import (
 	"github.com/vibrantgio/style"
 	vsvg "github.com/vibrantgio/svg/driver/gio"
 	"github.com/vibrantgio/svg/parser"
-	vtext "github.com/vibrantgio/text"
+	"github.com/vibrantgio/textdraw"
 
 	"github.com/fogleman/primitive/primitive"
 	"github.com/nfnt/resize"
@@ -92,7 +92,7 @@ func Primitive() {
 			}
 
 			msg := fmt.Sprintf("%v", time.Since(start).Round(time.Microsecond))
-			text := vtext.Text(shaper, style.H5, 0.0, 0.0, color.Black, msg)
+			text := textdraw.Text(shaper, style.H5, 0.0, 0.0, color.Black, msg)
 			layout.UniformInset(12).Layout(gtx, text)
 			frame.Frame(ops)
 		}

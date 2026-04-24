@@ -8,8 +8,10 @@ require (
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/vibrantgio/style v0.0.1
 	github.com/vibrantgio/svg v0.0.3
-	github.com/vibrantgio/text v0.0.1
+	github.com/vibrantgio/textdraw v0.0.2
 )
+
+require github.com/vibrantgio/text v0.0.1 // indirect
 
 require (
 	eliasnaur.com/font v0.0.0-20230308162249-dd43949cb42d // indirect
@@ -23,6 +25,6 @@ require (
 	golang.org/x/exp/shiny v0.0.0-20230725093048-515e97ebf090 // indirect
 	golang.org/x/image v0.9.0
 	golang.org/x/net v0.12.0 // indirect
-	golang.org/x/sys v0.10.0 // indirect
+	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.11.0 // indirect
 )
