@@ -6,7 +6,7 @@ require (
 	github.com/benoitkugler/pdf v0.0.14
 	github.com/srwiley/rasterx v0.0.0-20220730225603-2ab79fcdd4ef
 	golang.org/x/image v0.9.0
-	golang.org/x/net v0.9.0
+	golang.org/x/net v0.12.0
 )
 
 require (

@@ -17,11 +17,10 @@ import (
 	"gioui.org/op"
 	"gioui.org/text"
 
-	"github.com/reactivego/gio"
-	"github.com/reactivego/gio/style"
-	"github.com/reactivego/gio/svg"
+	"github.com/vibrantgio/style"
+	vsvg "github.com/vibrantgio/svg/driver/gio"
 	"github.com/vibrantgio/svg/parser"
-	svggio "github.com/vibrantgio/svg/driver/gio"
+	vtext "github.com/vibrantgio/text"
 
 	primitives "github.com/fogleman/primitive/primitive"
 	"github.com/nfnt/resize"
@@ -70,7 +69,7 @@ func Berries() {
 			}
 			par := parser.NewParser(parser.WarnErrorMode)
 			if icon, err := par.ParseStream(bytes.NewBufferString(model.SVG())); err == nil {
-				if widget, err := svggio.IconWidget(icon, 128, 128, 1.0); err == nil {
+				if widget, err := vsvg.IconWidget(icon, 128, 128, 1.0); err == nil {
 					select {
 					case <-poison:
 						return
@@ -111,7 +110,7 @@ func Berries() {
 			}
 
 			msg := fmt.Sprintf("%v", time.Since(start).Round(time.Microsecond))
-			text := gio.Text(shaper, style.H5, 0.0, 0.0, color.Black, msg)
+			text := vtext.Text(shaper, style.H5, 0.0, 0.0, color.Black, msg)
 			layout.UniformInset(12).Layout(gtx, text)
 			frame.Frame(ops)
 		}

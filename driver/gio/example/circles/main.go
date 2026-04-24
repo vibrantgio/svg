@@ -14,10 +14,10 @@ import (
 	"gioui.org/op"
 	"gioui.org/text"
 
-	"github.com/reactivego/gio"
-	"github.com/reactivego/gio/style"
-	"github.com/reactivego/gio/svg"
+	"github.com/vibrantgio/style"
+	vsvg "github.com/vibrantgio/svg/driver/gio"
 	"github.com/vibrantgio/svg/parser"
+	vtext "github.com/vibrantgio/text"
 )
 
 func main() {
@@ -36,7 +36,7 @@ func Circles() {
 		app.Size(1000, 700))
 
 	parser := parser.NewParser(parser.WarnErrorMode)
-	widget := try(svg.IconWidget(try(parser.ParseStream(bytes.NewBuffer(circles_svg))), 0, 0, 1.0))
+	widget := try(vsvg.IconWidget(try(parser.ParseStream(bytes.NewBuffer(circles_svg))), 0, 0, 1.0))
 
 	ops := new(op.Ops)
 	shaper := text.NewShaper(style.FontFaces())
@@ -48,7 +48,7 @@ func Circles() {
 			layout.UniformInset(24).Layout(gtx, widget)
 
 			msg := fmt.Sprintf("%v", time.Since(start).Round(time.Microsecond))
-			text := gio.Text(shaper, style.H5, 0.0, 0.0, color.Black, msg)
+			text := vtext.Text(shaper, style.H5, 0.0, 0.0, color.Black, msg)
 			layout.UniformInset(12).Layout(gtx, text)
 			frame.Frame(ops)
 		}

@@ -17,10 +17,10 @@ import (
 	"gioui.org/op"
 	"gioui.org/text"
 
-	"github.com/reactivego/gio"
-	"github.com/reactivego/gio/style"
-	"github.com/reactivego/gio/svg"
+	"github.com/vibrantgio/style"
+	vsvg "github.com/vibrantgio/svg/driver/gio"
 	"github.com/vibrantgio/svg/parser"
+	vtext "github.com/vibrantgio/text"
 
 	"github.com/fogleman/primitive/primitive"
 	"github.com/nfnt/resize"
@@ -61,7 +61,7 @@ func Primitive() {
 				model.Step(primitive.ShapeTypeTriangle, 128, 0)
 			}
 			if icon, err := parser.NewParser(parser.WarnErrorMode).ParseStream(bytes.NewBufferString(model.SVG())); err == nil {
-				if widget, err := svg.IconWidget(icon, 128, 128, 1.0); err == nil {
+				if widget, err := vsvg.IconWidget(icon, 128, 128, 1.0); err == nil {
 					widgets <- widget
 				}
 			}
@@ -92,7 +92,7 @@ func Primitive() {
 			}
 
 			msg := fmt.Sprintf("%v", time.Since(start).Round(time.Microsecond))
-			text := gio.Text(shaper, style.H5, 0.0, 0.0, color.Black, msg)
+			text := vtext.Text(shaper, style.H5, 0.0, 0.0, color.Black, msg)
 			layout.UniformInset(12).Layout(gtx, text)
 			frame.Frame(ops)
 		}
