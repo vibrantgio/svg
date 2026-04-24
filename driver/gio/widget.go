@@ -14,7 +14,7 @@ import (
 // According to the IconWidget specification, default value when the preserveAspectRatio attribute
 // is not specified is "xMidYMid meet". This means that the image is scaled to fit the viewport
 // while preserving the aspect ratio. The image is centered in the viewport along the x and y axes.
-func IconWidget(icon *svg.Icon, width, height unit.Dp, opacity float64) (layout.Widget, error) {
+func IconWidget(icon *svg.Icon, width, height unit.Dp, opacity float64) layout.Widget {
 	return func(gtx layout.Context) layout.Dimensions {
 		if width == 0 {
 			width = unit.Dp(icon.ViewBox.W)
@@ -27,5 +27,5 @@ func IconWidget(icon *svg.Icon, width, height unit.Dp, opacity float64) (layout.
 		drv := NewDriver(gtx.Ops)
 		driver.Draw(drv, icon, opacity)
 		return layout.Dimensions{Size: size}
-	}, nil
+	}
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/vibrantgio/svg/driver"
 )
 
-func NewDriver(ops *op.Ops) driver.Driver {
+func NewDriver(ops *op.Ops) *Driver {
 	return &Driver{Ops: ops}
 }
 
@@ -40,7 +40,6 @@ func Pt(p fixed.Point26_6) f32.Point {
 // will be performed on the Filler first and then on the Stroker.
 // This promise may enable the implementation to avoid duplicating filled and stroked paths.
 func (drv *Driver) SetupDrawers(willFill, willStroke bool) (driver.Filler, driver.Stroker) {
-	// fmt.Printf("SetupDrawers willFill=%t willStroke=%t\n", willFill, willStroke)
 	drv.fill = willFill
 	drv.stroke = willStroke
 	switch {
@@ -57,40 +56,32 @@ func (drv *Driver) SetupDrawers(willFill, willStroke bool) (driver.Filler, drive
 
 // Clear must reset the internal state, before starting a new path painting
 func (drv *Driver) Clear() {
-	// fmt.Println("Clear")
 	//	drv.Ops.Reset()
 	drv.Clip.Begin(drv.Ops)
 }
 
 // Start starts a new path at the given point.
 func (drv *Driver) Start(a fixed.Point26_6) {
-	// fmt.Printf("Start a={X:%v,Y:%v}\n", a.X, a.Y)
 	drv.Clip.MoveTo(Pt(a))
 }
 
 // Line Adds a line for the current point to `b`
 func (drv *Driver) Line(b fixed.Point26_6) {
-	// fmt.Printf("Line b={X:%v,Y:%v}\n", b.X, b.Y)
 	drv.Clip.LineTo(Pt(b))
 }
 
 // QuadBezier adds a quadratic bezier curve to the path
 func (drv *Driver) QuadBezier(b, c fixed.Point26_6) {
-	// Add necessary logic to add a quadratic bezier curve
-	// fmt.Printf("QuadBezier b=%v c=%v\n", b, c)
 	drv.Clip.QuadTo(Pt(b), Pt(c))
 }
 
 // CubeBezier adds a cubic bezier curve to the path
 func (drv *Driver) CubeBezier(b, c, d fixed.Point26_6) {
-	// Add necessary logic to add a cubic bezier curve
-	// fmt.Printf("CubeBezier b=%v c=%v d=%v\n", b, c, d)
 	drv.Clip.CubeTo(Pt(b), Pt(c), Pt(d))
 }
 
 // Closes the path to the start point if `closeLoop` is true
 func (drv *Driver) Stop(closeLoop bool) {
-	// fmt.Printf("Stop closeLoop=%t\n", closeLoop)
 	if closeLoop {
 		drv.Clip.Close()
 	}
@@ -105,8 +96,6 @@ type filler struct {
 
 // Draw fills or strokes the accumulated path using the given color
 func (drv *filler) Draw(col svg.Pattern, opacity float64) {
-	// Add necessary logic to fill or stroke the path using the given color and opacity
-	// fmt.Printf("Draw color=%v opacity=%v\n", color, opacity)
 	switch c := col.(type) {
 	case svg.PlainColor:
 		shape := clip.Outline{Path: drv.Clip.End()}.Op()
@@ -120,7 +109,6 @@ func (drv *filler) Draw(col svg.Pattern, opacity float64) {
 // Decide to use or not the "non-zero winding" rule for the current path
 func (drv *filler) SetWinding(useNonZeroWinding bool) {
 	drv.nonZeroWinding = useNonZeroWinding
-	// fmt.Printf("SetWinding useNonZeroWinding=%t\n", useNonZeroWinding)
 }
 
 type stroker struct {
@@ -130,43 +118,32 @@ type stroker struct {
 
 // Clear must reset the internal state, before starting a new path painting
 func (drv *stroker) Clear() {
-	// fmt.Println("Clear")
 }
 
 // Start starts a new path at the given point.
 func (drv *stroker) Start(a fixed.Point26_6) {
-	// fmt.Printf("Start a=%v\n", a)
 }
 
 // Line Adds a line for the current point to `b`
 func (drv *stroker) Line(b fixed.Point26_6) {
-	// fmt.Printf("Line b=%v\n", b)
 }
 
 // QuadBezier adds a quadratic bezier curve to the path
 func (drv *stroker) QuadBezier(b, c fixed.Point26_6) {
-	// Add necessary logic to add a quadratic bezier curve
-	// fmt.Printf("QuadBezier b=%v c=%v\n", b, c)
 }
 
 // CubeBezier adds a cubic bezier curve to the path
 func (drv *stroker) CubeBezier(b, c, d fixed.Point26_6) {
-	// Add necessary logic to add a cubic bezier curve
-	// fmt.Printf("CubeBezier b=%v c=%v d=%v\n", b, c, d)
 }
 
 // Closes the path to the start point if `closeLoop` is true
 func (drv *stroker) Stop(closeLoop bool) {
-	// fmt.Printf("Stop closeLoop=%t\n", closeLoop)
 }
 
 func (drv *stroker) Draw(color svg.Pattern, opacity float64) {
-	// Add necessary logic to fill or stroke the path using the given color and opacity
-	// fmt.Printf("Draw color=%v opacity=%v\n", color, opacity)
 }
 
 // Parametrize the stroking style for the current path
 func (drv *stroker) SetStrokeOptions(options driver.StrokeOptions) {
 	drv.strokeOptions = options
-	// fmt.Printf("SetStrokeOptions options=%v\n", options)
 }

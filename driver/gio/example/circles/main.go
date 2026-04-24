@@ -36,7 +36,7 @@ func Circles() {
 		app.Size(1000, 700))
 
 	parser := parser.NewParser(parser.WarnErrorMode)
-	widget := try(vsvg.IconWidget(try(parser.ParseStream(bytes.NewBuffer(circles_svg))), 0, 0, 1.0))
+	widget := vsvg.IconWidget(try(parser.ParseStream(bytes.NewBuffer(circles_svg))), 0, 0, 1.0)
 
 	ops := new(op.Ops)
 	shaper := text.NewShaper(style.FontFaces())

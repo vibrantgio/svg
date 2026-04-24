@@ -61,9 +61,7 @@ func Primitive() {
 				model.Step(primitive.ShapeTypeTriangle, 128, 0)
 			}
 			if icon, err := parser.NewParser(parser.WarnErrorMode).ParseStream(bytes.NewBufferString(model.SVG())); err == nil {
-				if widget, err := vsvg.IconWidget(icon, 128, 128, 1.0); err == nil {
-					widgets <- widget
-				}
+				widgets <- vsvg.IconWidget(icon, 128, 128, 1.0)
 			}
 		}
 		close(widgets)

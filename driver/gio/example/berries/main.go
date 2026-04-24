@@ -69,12 +69,11 @@ func Berries() {
 			}
 			par := parser.NewParser(parser.WarnErrorMode)
 			if icon, err := par.ParseStream(bytes.NewBufferString(model.SVG())); err == nil {
-				if widget, err := vsvg.IconWidget(icon, 128, 128, 1.0); err == nil {
-					select {
-					case <-poison:
-						return
-					case widgets <- widget:
-					}
+				widget := vsvg.IconWidget(icon, 128, 128, 1.0)
+				select {
+				case <-poison:
+					return
+				case widgets <- widget:
 				}
 			}
 		}
