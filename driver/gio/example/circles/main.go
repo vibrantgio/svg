@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"gioui.org/app"
-	"gioui.org/io/system"
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/text"
@@ -31,7 +30,8 @@ var circles_svg []byte
 func Circles() {
 	defer catch()
 
-	window := app.NewWindow(
+	window := new(app.Window)
+	window.Option(
 		app.Title("SVG - Circles"),
 		app.Size(1000, 700))
 
@@ -39,10 +39,13 @@ func Circles() {
 	widget := vsvg.IconWidget(try(parser.ParseStream(bytes.NewBuffer(circles_svg))), 0, 0, 1.0)
 
 	ops := new(op.Ops)
-	shaper := text.NewShaper(style.FontFaces())
-	for event := range window.Events() {
-		if frame, ok := event.(system.FrameEvent); ok {
-			gtx := layout.NewContext(ops, frame)
+	shaper := text.NewShaper(text.WithCollection(style.FontFaces()))
+	for {
+		switch e := window.Event().(type) {
+		case app.DestroyEvent:
+			os.Exit(0)
+		case app.FrameEvent:
+			gtx := app.NewContext(ops, e)
 			start := time.Now()
 
 			layout.UniformInset(24).Layout(gtx, widget)
@@ -50,9 +53,7 @@ func Circles() {
 			msg := fmt.Sprintf("%v", time.Since(start).Round(time.Microsecond))
 			text := textdraw.Text(shaper, style.H5, 0.0, 0.0, color.Black, msg)
 			layout.UniformInset(12).Layout(gtx, text)
-			frame.Frame(ops)
+			e.Frame(gtx.Ops)
 		}
 	}
-
-	os.Exit(0)
 }

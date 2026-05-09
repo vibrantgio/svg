@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"gioui.org/app"
-	"gioui.org/io/system"
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/text"
@@ -37,7 +36,8 @@ var ipace_jpeg []byte
 func Primitive() {
 	defer catch()
 
-	window := app.NewWindow(
+	window := new(app.Window)
+	window.Option(
 		app.Title("SVG - Primitive"),
 		app.Size(1000, 700))
 
@@ -49,7 +49,7 @@ func Primitive() {
 	bg := primitive.MakeColor(primitive.AverageImageColor(thumbnail))
 	model := primitive.NewModel(thumbnail, bg, 1024, runtime.NumCPU())
 
-	shaper := text.NewShaper(style.FontFaces())
+	shaper := text.NewShaper(text.WithCollection(style.FontFaces()))
 
 	// Run the algorithm for a specified number of steps
 	const steps = 1000
@@ -69,9 +69,12 @@ func Primitive() {
 
 	ops := new(op.Ops)
 	var icon layout.Widget
-	for event := range window.Events() {
-		if frame, ok := event.(system.FrameEvent); ok {
-			gtx := layout.NewContext(ops, frame)
+	for {
+		switch e := window.Event().(type) {
+		case app.DestroyEvent:
+			os.Exit(0)
+		case app.FrameEvent:
+			gtx := app.NewContext(ops, e)
 			start := time.Now()
 
 			// Receive the next SVG icon
@@ -79,10 +82,10 @@ func Primitive() {
 			case i, received := <-widgets:
 				if received {
 					icon = i
-					op.InvalidateOp{}.Add(ops)
+					gtx.Execute(op.InvalidateCmd{})
 				}
 			default:
-				op.InvalidateOp{At: time.Now().Add(250 * time.Millisecond)}.Add(ops)
+				gtx.Execute(op.InvalidateCmd{At: time.Now().Add(250 * time.Millisecond)})
 			}
 
 			if icon != nil {
@@ -92,9 +95,7 @@ func Primitive() {
 			msg := fmt.Sprintf("%v", time.Since(start).Round(time.Microsecond))
 			text := textdraw.Text(shaper, style.H5, 0.0, 0.0, color.Black, msg)
 			layout.UniformInset(12).Layout(gtx, text)
-			frame.Frame(ops)
+			e.Frame(gtx.Ops)
 		}
 	}
-
-	os.Exit(0)
 }
