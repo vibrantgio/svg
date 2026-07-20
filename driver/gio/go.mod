@@ -6,9 +6,9 @@ require (
 	gioui.org v0.9.0
 	github.com/fogleman/primitive v0.0.0-20200504002142-0373c216458b
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
-	github.com/vibrantgio/style v0.0.2
-	github.com/vibrantgio/svg v0.0.3
-	github.com/vibrantgio/textdraw v0.0.2
+	github.com/vibrantgio/style v0.0.3
+	github.com/vibrantgio/svg v0.0.5
+	github.com/vibrantgio/textdraw v0.0.3
 )
 
 require (
@@ -17,7 +17,7 @@ require (
 	github.com/fogleman/gg v1.3.0 // indirect
 	github.com/go-text/typesetting v0.3.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/vibrantgio/font v0.0.2 // indirect
+	github.com/vibrantgio/font v0.0.3 // indirect
 	golang.org/x/exp/shiny v0.0.0-20250408133849-7e4ce0ab07d0 // indirect
 	golang.org/x/image v0.26.0
 	golang.org/x/net v0.39.0 // indirect
