@@ -6,7 +6,7 @@ require (
 	gioui.org v0.10.0
 	github.com/vibrantgio/seen v0.0.5
 	github.com/vibrantgio/seen/context/gio v0.0.5
-	github.com/vibrantgio/svg v0.0.4
+	github.com/vibrantgio/svg v0.0.5
 	golang.org/x/image v0.26.0
 )
 
