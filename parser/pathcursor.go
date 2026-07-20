@@ -368,7 +368,7 @@ func (c *pathCursor) ellipseAt(cx, cy, rx, ry float64) {
 func (c *pathCursor) addArcFromA(points []float64) {
 	cx, cy := findEllipseCenter(&points[0], &points[1], points[2]*math.Pi/180, c.placeX,
 		c.placeY, points[5], points[6], points[4] == 0, points[3] == 0)
-	c.placeX, c.placeY = c.path.AddArc(c.points, cx+c.curX, cy+c.curY, c.placeX+c.curX, c.placeY+c.curY)
+	c.placeX, c.placeY = c.path.AddArc(points[:7], cx+c.curX, cy+c.curY, c.placeX+c.curX, c.placeY+c.curY)
 }
 
 // findEllipseCenter locates the center of the Ellipse if it exists. If it does not exist,
