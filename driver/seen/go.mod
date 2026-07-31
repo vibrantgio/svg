@@ -4,9 +4,9 @@ go 1.25.1
 
 require (
 	gioui.org v0.10.1
-	github.com/vibrantgio/seen v0.0.6
-	github.com/vibrantgio/seen/context/gio v0.0.8
-	github.com/vibrantgio/svg v0.0.7
+	github.com/vibrantgio/seen v0.0.7
+	github.com/vibrantgio/seen/context/gio v0.0.7
+	github.com/vibrantgio/svg v0.0.8
 	golang.org/x/image v0.44.0
 )
 
