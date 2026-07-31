@@ -3,7 +3,7 @@ module github.com/vibrantgio/svg/driver/seen
 go 1.24.1
 
 require (
-	gioui.org v0.10.0
+	gioui.org v0.10.1
 	github.com/vibrantgio/seen v0.0.5
 	github.com/vibrantgio/seen/context/gio v0.0.5
 	github.com/vibrantgio/svg v0.0.5
