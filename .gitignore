@@ -1,2 +1,7 @@
 .DS_Store
 .vscode
+
+# Test output: driver/pdf tests only write these, never read or compare
+# them, and the PDF writer numbers objects in Go map order, so they churn
+# on every run. Artifacts, not goldens.
+driver/pdf/testdata_out/
