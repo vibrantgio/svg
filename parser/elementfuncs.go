@@ -437,8 +437,7 @@ func useF(c *svgCursor, attrs []xml.Attr) error {
 		}
 		df, ok := elementFuncs[def.Tag]
 		if !ok {
-			errStr := "Cannot process svg element " + def.Tag
-			return HandleError(c.errorMode, errStr)
+			return HandleError(c.errorMode, "Cannot process svg element %s", def.Tag)
 		}
 		if err := df(c, def.Attrs); err != nil {
 			return err
