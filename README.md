@@ -1,7 +1,7 @@
 # svg
 
 An SVG parser and renderer for Go, for
-[VibrantGio](https://github.com/vibrantgio), a design system for native desktop
+[Vibrant Gio](https://github.com/vibrantgio), a design system for native desktop
 applications on macOS, Windows and Linux, written in pure Go on
 [Gio](https://gioui.org). Forked from
 [benoitkugler/oksvg](https://github.com/benoitkugler/oksvg), itself a heavily
