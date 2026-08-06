@@ -130,7 +130,9 @@ func (c *svgCursor) readStyleAttr(curStyle *svg.PathStyle, k, v string) error {
 		curStyle.FillColor = optCol.AsPattern()
 		return err
 	case "fill-rule":
-		curStyle.UseNonZeroWinding = strings.EqualFold(v, "evenodd")
+		// nonzero is the SVG initial value; anything other than evenodd
+		// keeps the non-zero winding rule.
+		curStyle.UseNonZeroWinding = !strings.EqualFold(v, "evenodd")
 	case "stroke":
 		gradient, ok := c.readGradURL(v, curStyle.LineColor)
 		if ok {

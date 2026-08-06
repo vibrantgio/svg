@@ -126,22 +126,22 @@ typography, and the pitfalls that are not guessable:
 
 Honest about what does not work yet. Every count below is measured.
 
-- **`fill-rule` is parsed backwards.** `parser/svgcursor.go:133` reads
-
-      curStyle.UseNonZeroWinding = strings.EqualFold(v, "evenodd")
-
-  which sets non-zero winding when the document asks for `evenodd`, and even-odd
-  when it asks for `nonzero`. `svg.DefaultStyle.UseNonZeroWinding` is `true` and
-  correct, so only documents that *state* a fill rule are affected — but those
-  are exactly the documents that state it because it matters. A self-intersecting
-  or hole-punched path with an explicit `fill-rule` fills wrong.
+- **`fill-rule` used to be parsed backwards — fixed.** `parser/svgcursor.go:133`
+  set non-zero winding when the document asked for `evenodd`, and even-odd when
+  it asked for `nonzero` — inverted on both values, for any document that
+  *stated* a fill rule. The parser now keeps non-zero winding unless the
+  document states `evenodd`, matching the SVG initial value, and
+  `driver/raster`'s `TestFillRuleWinding` pins all three cases — `nonzero`,
+  `evenodd` and unstated — with a self-intersecting pentagram rendered through
+  a winding-aware scanner.
 - **The Gio driver ignores winding entirely**, which is why nothing in the
-  design system has noticed the bug above. `driver/gio/driver.go:59` is
+  design system noticed the inverted parse while it was live.
+  `driver/gio/driver.go:59` is
   `func (d *Driver) SetWinding(useNonZeroWinding bool) {}` — an empty body —
   because it paints through `clip.Outline`, which is non-zero only. The other
   three drivers do honour the flag: `raster` forwards it to the rasterx scanner,
-  `pdf` and `seen` store it. So the inverted parse is invisible under Gio and
-  live everywhere else.
+  `pdf` and `seen` store it. So an `evenodd` document still renders wrong under
+  Gio — not from the parser, but because the backend has no even-odd rule.
 - **`driver/seen` does not build.** `go build ./...` fails with
   `verifying github.com/vibrantgio/seen/context/gio@v0.0.7: checksum mismatch`
   on a stale `go.sum` pin. The other four modules build and vet clean. Known and
@@ -158,11 +158,11 @@ Honest about what does not work yet. Every count below is measured.
   are not two stops with pad spreading fall back to rasterizing into an
   off-screen `image.RGBA` with a per-pixel Go loop, inside the draw path, every
   frame.
-- **Nine of eleven packages have no tests at all.** Only `parser` (21.7%
-  coverage, two tests) and `driver/pdf` have any. Untested: the root model,
-  `matrix`, `driver/dummy`, `driver/raster`, all four packages of `driver/gio` —
-  and `driver` itself, the `Draw` walker every backend depends on and every
-  consumer calls.
+- **Eight of eleven packages have no tests at all.** Only `parser` (21.7%
+  coverage, two tests), `driver/pdf` and `driver/raster` (one test, the
+  fill-rule regression) have any. Untested: the root model, `matrix`,
+  `driver/dummy`, all four packages of `driver/gio` — and `driver` itself, the
+  `Draw` walker every backend depends on and every consumer calls.
 - **`driver/pdf`'s 97.4% coverage is not what it looks like.** The test renders
   all seventy-four SVGs under `driver/testdata` and never reads the output back.
   The repository says so in its own `.gitignore`: *"driver/pdf tests only write
