@@ -29,7 +29,7 @@ nested modules: `driver/gio/` (`github.com/vibrantgio/svg/driver/gio`),
 `driver/pdf/` (`github.com/vibrantgio/svg/driver/pdf`), `driver/raster/`
 (`github.com/vibrantgio/svg/driver/raster`), `driver/seen/`
 (`github.com/vibrantgio/svg/driver/seen`). Nested-module tags carry the
-directory as a prefix — `driver/gio/v0.0.7`, not `v0.0.7`.
+directory as a prefix — `driver/gio/v0.0.9`, not `v0.0.9`.
 
 **Build and test.** From the repository root, and again inside each nested
 module directory — `./...` does not cross a module boundary:
