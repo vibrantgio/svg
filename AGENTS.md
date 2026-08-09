@@ -2,10 +2,14 @@
 
 An SVG parser and renderer for Go, forked from `benoitkugler/oksvg`:
 `parser` reads a document into an `svg.Icon` — a view box, a transform, and
-styled paths built out of `Operation` values — and a driver puts that icon
-somewhere. The four drivers are separate modules so their dependencies stay
-out of the parser: `driver/gio` (a Gio `op.Ops` driver and `IconWidget`),
-`driver/raster`, `driver/pdf` and `driver/seen`.
+styled paths built out of `Operation` values — and a driver, implementing
+`driver.DrawerNG`, puts that icon somewhere. Each rendering driver is a
+module of its own so that a caller taking one does not take the others'
+dependencies; the Modules paragraph below lists which they are, measured
+from the tree rather than typed here. `driver/gio` is the one the rest of
+the organization uses, and it adds `IconWidget`. `driver/dummy` is the
+exception that is not a module: it logs every draw call and renders
+nothing, so it needs nothing the parser does not already have.
 
 **Layer.** Outside ADR-001's tier table: a support library, which the rule
 binds in one direction only — every tier may import it, and it may import
@@ -38,19 +42,3 @@ directory as a prefix — `driver/gio/v0.0.9`, not `v0.0.9`.
 module directory — `./...` does not cross a module boundary:
 
     go build ./... && go test ./...
-
-**`driver/seen` does not build from a clean checkout**, and did not before
-this file existed. Its `go.sum` pins `github.com/vibrantgio/seen/context/gio
-v0.0.7` to a hash that no published form of that module produces, so the build
-stops with a checksum mismatch before compiling anything. `workbench/launcher`
-is stuck on the identical line.
-
-Nothing local is missing and no push closes it: the tag on GitHub, the module
-proxy and a `GOPROXY=direct` fetch all agree with one another and all disagree
-with `go.sum`, which records content that was never published. Dropping the
-two `seen/context/gio v0.0.7` lines and re-running `go mod tidy` restores the
-build — `go mod tidy` on its own cannot, because it verifies before it
-rewrites. Do that deliberately, in a change that says so, rather than as a
-side effect of unrelated work.
-
-The root module and the other three drivers are green.
