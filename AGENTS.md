@@ -7,14 +7,17 @@ somewhere. The four drivers are separate modules so their dependencies stay
 out of the parser: `driver/gio` (a Gio `op.Ops` driver and `IconWidget`),
 `driver/raster`, `driver/pdf` and `driver/seen`.
 
-**Layer.** Outside ADR-001's tier table: a support library the design
-system consumes and never depends on. prism's `icon` package holds an
-`svg.Icon`, its `icon/gallery` renders one through `svg/parser` and
-`svg/driver/gio`, and markdown's `svgimage` uses that same pair for inline
-images. Nothing here imports the design system except the three demo
-programs under `driver/gio/example/`, which use the tier-0 leaves `style`
-and `textdraw`; `driver/seen` is the one place svg depends on another
-support library.
+**Layer.** Outside ADR-001's tier table: a support library, which the rule
+binds in one direction only — every tier may import it, and it may import
+nothing in the table itself. Its root module imports nothing else in the
+organization. Its nested modules `svg/driver/gio` and `svg/driver/seen` add
+`font`, `seen`, `seen/context/gio`, `style` and `textdraw` — those edges
+are theirs and not the root module's. Imported by `cadence`, `markdown` and
+`prism`. Outside the tier table, also by the demo module `prism/gallery`
+and the workbench applications `feeds`, `mindchat` and `watchlist`. Both
+directions are measured rather than typed — `scripts/check-layers.sh
+--edges` reports the graph and `scripts/sync-agents.sh` renders these
+sentences from it — so correcting them here changes nothing.
 
 **Read the canonical guide before you write code against this module.** It is
 the organization's one agent guide — the module inventory with current tags,
