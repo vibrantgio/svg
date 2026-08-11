@@ -16,8 +16,8 @@ binds in one direction only — every tier may import it, and it may import
 nothing in the table itself. Its root module imports nothing else in the
 organization. Its nested modules `svg/driver/gio` and `svg/driver/seen` add
 `font`, `seen`, `seen/context/gio`, `style` and `textdraw` — those edges
-are theirs and not the root module's. Imported by `cadence`, `components`
-and `markdown`. Outside the tier table, also by the demo module
+are theirs and not the root module's. Imported by `components`, `markdown`
+and `patterns`. Outside the tier table, also by the demo module
 `components/gallery` and the workbench applications `feeds`, `mindchat` and
 `watchlist`. Both directions are measured rather than typed —
 `scripts/check-layers.sh --edges` reports the graph and
