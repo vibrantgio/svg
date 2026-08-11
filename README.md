@@ -37,7 +37,7 @@ full tier table.
 
 Two repositories in the design system use it, and both use the same three
 pieces — the root model, `parser` and `driver/gio`.
-[prism](https://github.com/vibrantgio/prism)'s `icon` package holds an
+[components](https://github.com/vibrantgio/components)'s `icon` package holds an
 `*svg.Icon` and its `icon/gallery` renders one;
 [markdown](https://github.com/vibrantgio/markdown)'s `svgimage` provides inline
 SVG images to a rendered document. Nothing here imports the design system except
