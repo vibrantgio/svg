@@ -51,11 +51,11 @@ func (d *Driver) SetStrokeOptions(options driver.StrokeOptions) {
 	)
 }
 
-func (d *Driver) Start(a fixed.Point26_6)              { d.ops = append(d.ops, svg.OpMoveTo(a)) }
-func (d *Driver) Line(b fixed.Point26_6)               { d.ops = append(d.ops, svg.OpLineTo(b)) }
-func (d *Driver) QuadBezier(b, c fixed.Point26_6)      { d.ops = append(d.ops, svg.OpQuadTo{b, c}) }
-func (d *Driver) CubeBezier(b, c, e fixed.Point26_6)   { d.ops = append(d.ops, svg.OpCubicTo{b, c, e}) }
-func (d *Driver) Close()                               { d.ops = append(d.ops, svg.OpClose{}) }
+func (d *Driver) Start(a fixed.Point26_6)            { d.ops = append(d.ops, svg.OpMoveTo(a)) }
+func (d *Driver) Line(b fixed.Point26_6)             { d.ops = append(d.ops, svg.OpLineTo(b)) }
+func (d *Driver) QuadBezier(b, c fixed.Point26_6)    { d.ops = append(d.ops, svg.OpQuadTo{b, c}) }
+func (d *Driver) CubeBezier(b, c, e fixed.Point26_6) { d.ops = append(d.ops, svg.OpCubicTo{b, c, e}) }
+func (d *Driver) Close()                             { d.ops = append(d.ops, svg.OpClose{}) }
 
 // pather is the subset of rasterx.Filler / rasterx.Dasher used when replaying
 // buffered path ops.

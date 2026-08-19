@@ -77,9 +77,9 @@ func TestClassifyDonutEvenOdd(t *testing.T) {
 }
 
 func TestClassifyDonutNonZero(t *testing.T) {
-	outer := square(0, 0, 10)             // CCW (positive area)
-	hole := reversed(square(0, 0, 4))     // CW: opposite winding cuts a hole
-	solid := square(0, 0, 2)              // CCW again: fills inside the hole
+	outer := square(0, 0, 10)         // CCW (positive area)
+	hole := reversed(square(0, 0, 4)) // CW: opposite winding cuts a hole
+	solid := square(0, 0, 2)          // CCW again: fills inside the hole
 	regions := classify([][]point.Point{outer, hole, solid}, true)
 	if len(regions) != 2 {
 		t.Fatalf("expected 2 regions (ring and center), got %d", len(regions))
