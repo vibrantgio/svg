@@ -17,8 +17,8 @@ github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 h1:DACJavvAHhabrF0
 github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0/go.mod h1:E/TSTwGwJL78qG/PmXZO1EjYhfJinVAhrmmHX6Z8B9k=
 github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 h1:zYyBkD/k9seD2A7fsi6Oo2LfFZAehjjQMERAvZLEDnQ=
 github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646/go.mod h1:jpp1/29i3P1S/RLdc7JQKbRpFeM1dOBd8T9ki5s+AY8=
-github.com/vibrantgio/font v0.1.0 h1:UXlYbXkf3Kbk5oxhdky1JFTTi8oV5Nf7Q8apDoCHFJM=
-github.com/vibrantgio/font v0.1.0/go.mod h1:3xY/uNoUn5FC2+gJ1g9se10R0z+gcWfF8kxvChF/HTQ=
+github.com/vibrantgio/font v0.2.0 h1:x2bAinz+alDFSQ1JHPs2UJ/nJsGt/hmnVPHW6wmoZFg=
+github.com/vibrantgio/font v0.2.0/go.mod h1:GqhPQAr9hyibHl4FtRLrqg7u83ONqXUKqQgstuL7Wi4=
 github.com/vibrantgio/style v0.0.6 h1:aAlbuYuj2W7CU2Xo0RkejB0pwd1b2wD7Z++goXgQSqY=
 github.com/vibrantgio/style v0.0.6/go.mod h1:imimbuZ7XmoEy690QOC6Kw0lUigJYUC1qDj4O2DXRdA=
 github.com/vibrantgio/svg v0.0.9 h1:0OCCmVFz13IIDR3oDZeyw0IMy2RKWKWReQIlsRRz9zw=

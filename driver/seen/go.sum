@@ -9,10 +9,10 @@ github.com/go-text/typesetting v0.3.4 h1:YYurUOtEb9kGSOz4uE3k4OpBGsp1dDL8+fjCeaF
 github.com/go-text/typesetting v0.3.4/go.mod h1:4qZCQphq4KSgGTAeI0uMEkVbROgfah8BuyF5LRYr7XY=
 github.com/go-text/typesetting-utils v0.0.0-20260223113751-2d88ac90dae3 h1:drBZzMgdYPbmyXqOto4YhhJGrFIQCX94FpR4MzTCsos=
 github.com/go-text/typesetting-utils v0.0.0-20260223113751-2d88ac90dae3/go.mod h1:3/62I4La/HBRX9TcTpBj4eipLiwzf+vhI+7whTc9V7o=
-github.com/vibrantgio/seen v0.0.7 h1:Ro1Tnqi+omEjPJTbDxK9XnVk2T9hqZuYIbS5+KpkHz0=
-github.com/vibrantgio/seen v0.0.7/go.mod h1:XIerMaflemFdCpWTADE87T5tc+OjZfM2oPq+Fo6dt1c=
-github.com/vibrantgio/seen/context/gio v0.0.7 h1:OJip+UYNVDIgtTyENczDpdm4CEQHYB+kNfVD5H2LwDU=
-github.com/vibrantgio/seen/context/gio v0.0.7/go.mod h1:qmUvReYGDlVXW/U+/6yFSztl5iCOwkIqko6beyq8Kyk=
+github.com/vibrantgio/seen v0.0.8 h1:UwOK6yhKNRgTdojQYKN69QbGlUmAAeHht2kr4+V8XC0=
+github.com/vibrantgio/seen v0.0.8/go.mod h1:XIerMaflemFdCpWTADE87T5tc+OjZfM2oPq+Fo6dt1c=
+github.com/vibrantgio/seen/context/gio v0.0.8 h1:VRA1Dm7Y8WtEi+IWBPIyKgQUfibcIX5tik3/KEuDkYg=
+github.com/vibrantgio/seen/context/gio v0.0.8/go.mod h1:TAMe+7C7lfWCrjLDGMPax0a3pZVunj2NJkGh6L/iZi8=
 github.com/vibrantgio/svg v0.0.8 h1:c2vJujbpUlukLrifi0M4feHLE8jqthyvmOvcNDY5r4k=
 github.com/vibrantgio/svg v0.0.8/go.mod h1:H867wFCLH1Lfz+uoklXwtvOTAQgg/7DC0KoZm6nRHUA=
 golang.org/x/exp v0.0.0-20260727155853-b88d891fe743 h1:ex206bKw+v3K0dm3andkrIF+ijyQKJG1pLgwQ2PYdQM=
