@@ -50,7 +50,7 @@ go get github.com/vibrantgio/svg/driver/gio
 ```
 
 Five modules, all Go 1.25.1: the root, plus `driver/gio`, `driver/pdf`,
-`driver/raster` and `driver/seen`. `driver/gio` is on gioui.org v0.10.1 like the
+`driver/raster` and `driver/seen`. `driver/gio` is on gioui.org v0.10.2 like the
 rest of the organization. Nested-module tags carry the directory as a prefix —
 `driver/gio/v0.0.7`, not `v0.0.7` — and versions are per module, not lockstep
 with the root. See Status.

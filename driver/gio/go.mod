@@ -3,7 +3,7 @@ module github.com/vibrantgio/svg/driver/gio
 go 1.25.1
 
 require (
-	gioui.org v0.10.1
+	gioui.org v0.10.2
 	github.com/fogleman/primitive v0.0.0-20200504002142-0373c216458b
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/vibrantgio/style v0.0.6
@@ -14,7 +14,7 @@ require (
 require golang.org/x/exp v0.0.0-20260727155853-b88d891fe743 // indirect
 
 require (
-	gioui.org/shader v1.0.8 // indirect
+	gioui.org/shader v1.0.9 // indirect
 	github.com/fogleman/gg v1.3.0 // indirect
 	github.com/go-text/typesetting v0.3.4 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
