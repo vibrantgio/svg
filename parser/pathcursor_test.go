@@ -21,9 +21,7 @@ func parsePath(t *testing.T, d string) string {
 
 // TestChainedArcsMatchSplitArcs verifies every 7-value set of a chained arc
 // command draws its own arc: one command carrying two arcs must produce the
-// same path as the equivalent two single-arc commands. A chained second arc
-// used to be drawn with the first arc's radii, flags, and endpoint — the
-// shape simple-icons paths hit constantly.
+// same path as the equivalent two single-arc commands.
 func TestChainedArcsMatchSplitArcs(t *testing.T) {
 	chained := parsePath(t, "M6 12a6 6 0 0 1 6-6 4 4 0 0 1 4 4")
 	split := parsePath(t, "M6 12a6 6 0 0 1 6-6a4 4 0 0 1 4 4")
@@ -39,8 +37,7 @@ func TestChainedArcsAdvance(t *testing.T) {
 	if !strings.Contains(got, "L0.000,0.000") {
 		t.Fatalf("path lost its trailing line: %s", got)
 	}
-	// The final arc endpoint precedes the line; with the bug the second
-	// 7-value set never contributed its 16,10 endpoint.
+	// The final arc endpoint precedes the line.
 	if !strings.Contains(got, "16.000,10.000") {
 		t.Errorf("path never reaches the second arc's endpoint 16,10: %s", got)
 	}

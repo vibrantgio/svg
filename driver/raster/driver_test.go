@@ -14,10 +14,9 @@ import (
 // TestFillRuleWinding renders a pentagram: a five-pointed star drawn as one
 // closed subpath that visits every second vertex, so its five edges
 // self-intersect. The centre pentagon has winding number two, so
-// it is filled under the non-zero rule and hollow under even-odd. The parser
-// used to invert fill-rule — evenodd set non-zero winding and vice versa —
-// and this is the regression test for that: an explicit nonzero and an
-// unstated rule must fill the centre, an explicit evenodd must not.
+// it is filled under the non-zero rule and hollow under even-odd: an explicit
+// nonzero and an unstated rule must fill the centre, an explicit evenodd
+// must not.
 //
 // The default rasterx.ScannerGV ignores SetWinding, so the star is rastered
 // through scanFT.ScannerFT, which honours it.

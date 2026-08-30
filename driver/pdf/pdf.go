@@ -186,7 +186,6 @@ func (r *Renderer) applyFillColor(color svg.Pattern, opacity float64) {
 		name := r.pdf.AddExtGState(gs)
 		r.pdf.Ops(contentstream.OpSetExtGState{Dict: name})
 	case svg.Gradient:
-		// mat := color.ApplyPathExtent(r.boundingBox.BBox)
 	}
 }
 

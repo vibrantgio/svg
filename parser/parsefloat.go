@@ -16,11 +16,6 @@ func parseFraction(v string) (f float64, err error) {
 	}
 	f, err = parseBasicFloat(v)
 	f /= d
-	// Is this is an unnecessary restriction? For now fractions can be all values not just in the range [0,1]
-	// if f > 1 {
-	// 	f = 1
-	// } else if f < 0 {
-	// 	f = 0
-	// }
+	// Fractions are not clamped: percentages outside [0,1] are legal here.
 	return
 }
