@@ -2,8 +2,8 @@ github.com/srwiley/rasterx v0.0.0-20220730225603-2ab79fcdd4ef h1:Ch6Q+AZUxDBCVqd
 github.com/srwiley/rasterx v0.0.0-20220730225603-2ab79fcdd4ef/go.mod h1:nXTWP6+gD5+LUJ8krVhhoeHjvHTutPxMYl5SvkcnJNE=
 github.com/srwiley/scanFT v0.0.0-20220128184157-0d1ee492111f h1:uLR2GaV0kWYZ3Ns3l3sjtiN+mOWAQadvrL8HXcyKjl0=
 github.com/srwiley/scanFT v0.0.0-20220128184157-0d1ee492111f/go.mod h1:LZwgIPG9X6nH6j5Ef+xMFspl6Hru4b5EJxzMfeqHYJY=
-github.com/vibrantgio/svg v0.0.9 h1:0OCCmVFz13IIDR3oDZeyw0IMy2RKWKWReQIlsRRz9zw=
-github.com/vibrantgio/svg v0.0.9/go.mod h1:H867wFCLH1Lfz+uoklXwtvOTAQgg/7DC0KoZm6nRHUA=
+github.com/vibrantgio/svg v0.1.0 h1:ke6LfUoJo5306rdJIfBSq85xZeunqubGBSnxa8xUIwg=
+github.com/vibrantgio/svg v0.1.0/go.mod h1:H867wFCLH1Lfz+uoklXwtvOTAQgg/7DC0KoZm6nRHUA=
 golang.org/x/image v0.44.0 h1:+tDekMZED9+LrtB3G5xzRggpVh9CARjZqROla3R3R+I=
 golang.org/x/image v0.44.0/go.mod h1:V8K3KE9KKKE+pLpQDOeN18w9oacNSvy1tDOirTu4xtY=
 golang.org/x/net v0.57.0 h1:K5+3DljvIuDG9/Jv9rvyMywYNFCQ9RSUY6OOTTkT+tE=

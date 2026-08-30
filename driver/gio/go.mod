@@ -7,7 +7,7 @@ require (
 	github.com/fogleman/primitive v0.0.0-20200504002142-0373c216458b
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/vibrantgio/style v0.0.6
-	github.com/vibrantgio/svg v0.0.9
+	github.com/vibrantgio/svg v0.1.0
 	github.com/vibrantgio/textdraw v0.0.4
 )
 

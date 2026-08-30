@@ -13,8 +13,8 @@ github.com/vibrantgio/seen v0.0.8 h1:UwOK6yhKNRgTdojQYKN69QbGlUmAAeHht2kr4+V8XC0
 github.com/vibrantgio/seen v0.0.8/go.mod h1:XIerMaflemFdCpWTADE87T5tc+OjZfM2oPq+Fo6dt1c=
 github.com/vibrantgio/seen/context/gio v0.0.8 h1:VRA1Dm7Y8WtEi+IWBPIyKgQUfibcIX5tik3/KEuDkYg=
 github.com/vibrantgio/seen/context/gio v0.0.8/go.mod h1:TAMe+7C7lfWCrjLDGMPax0a3pZVunj2NJkGh6L/iZi8=
-github.com/vibrantgio/svg v0.0.8 h1:c2vJujbpUlukLrifi0M4feHLE8jqthyvmOvcNDY5r4k=
-github.com/vibrantgio/svg v0.0.8/go.mod h1:H867wFCLH1Lfz+uoklXwtvOTAQgg/7DC0KoZm6nRHUA=
+github.com/vibrantgio/svg v0.1.0 h1:ke6LfUoJo5306rdJIfBSq85xZeunqubGBSnxa8xUIwg=
+github.com/vibrantgio/svg v0.1.0/go.mod h1:H867wFCLH1Lfz+uoklXwtvOTAQgg/7DC0KoZm6nRHUA=
 golang.org/x/exp v0.0.0-20260727155853-b88d891fe743 h1:ex206bKw+v3K0dm3andkrIF+ijyQKJG1pLgwQ2PYdQM=
 golang.org/x/exp v0.0.0-20260727155853-b88d891fe743/go.mod h1:EdfpwwqSu+0Li0mzskwHU6FWDV3t9Q+RZDo3QMUtL3Q=
 golang.org/x/exp/shiny v0.0.0-20260727155853-b88d891fe743 h1:rQLtGtwpYzQUyxCqrT3i4lGgvC1Q4G72JTHYncg6AvY=
