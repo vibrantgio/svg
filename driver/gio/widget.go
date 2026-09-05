@@ -10,7 +10,7 @@ import (
 	"github.com/vibrantgio/svg/driver"
 )
 
-// IconWidget returns a widget that renders the given IconWidget data using a clip.Path.
+// IconWidget returns a component that renders the given IconWidget data using a clip.Path.
 // According to the IconWidget specification, default value when the preserveAspectRatio attribute
 // is not specified is "xMidYMid meet". This means that the image is scaled to fit the viewport
 // while preserving the aspect ratio. The image is centered in the viewport along the x and y axes.

@@ -66,7 +66,7 @@ Five packages in the root module, one per driver module.
 | `svg/parser` | Document to icon. `NewParser(ErrorMode)` then `ParseStream(io.Reader)` or `ParseFile(name)`. `ErrorMode` is `IgnoreErrorMode` (the default), `WarnErrorMode` or `StrictErrorMode`. Shapes, transforms, gradients, `defs` and `use` are all reduced to styled paths here. |
 | `svg/driver` | The backend contract. `DrawerNG` is what a driver implements; `FillAndStroker` is an optional extra for targets that can do both in one pass. `Draw(d DrawerNG, i *svg.Icon, opacity float64)` is the walker every consumer calls. |
 | `svg/driver/dummy` | A `DrawerNG` that prints every call. The debugging backend, and the only driver that is not its own module. |
-| `svg/driver/gio` | Gio. `NewDriver(ops *op.Ops)` for the op list, and `IconWidget(icon, width, height unit.Dp, opacity float64) layout.Widget` when you just want a widget. This is the driver the design system uses. |
+| `svg/driver/gio` | Gio. `NewDriver(ops *op.Ops)` for the op list, and `IconWidget(icon, width, height unit.Dp, opacity float64) layout.Widget` when you just want a component. This is the driver the design system uses. |
 | `svg/driver/raster` | `*image.RGBA`, via `srwiley/rasterx`. `NewDriver(w, h int, scanner rasterx.Scanner)`, or `RasterSVGIconToImage(io.Reader)` for the whole job. |
 | `svg/driver/pdf` | A PDF content stream, via `benoitkugler/pdf`. `NewRenderer(cs)`, or `RenderSVGIconToPDF(icon io.Reader, pdfName string) error`. |
 | `svg/driver/seen` | 3-D. `NewDrawer(options...)` collects the paths and `Object(kind)` hands back a `seen.Object` of extruded faces. Options: `Tolerance`, `Size`, `Depth`, `LayerOffset`, `Flat`. |
@@ -105,7 +105,7 @@ that against a `//go:embed`-ed document:
 
 ```go
 parser := parser.NewParser(parser.WarnErrorMode)
-widget := vsvg.IconWidget(try(parser.ParseStream(bytes.NewBuffer(circles_svg))), 0, 0, 1.0)
+component := vsvg.IconWidget(try(parser.ParseStream(bytes.NewBuffer(circles_svg))), 0, 0, 1.0)
 ```
 
 Note the `WarnErrorMode` there rather than the `IgnoreErrorMode` markdown uses.

@@ -85,7 +85,7 @@ func Berries() {
 			gtx := app.NewContext(ops, e)
 			start := time.Now()
 
-			// Receive the next widget
+			// Receive the next component
 			select {
 			case i, received := <-widgets:
 				if received {
