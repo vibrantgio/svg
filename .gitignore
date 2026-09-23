@@ -5,3 +5,7 @@
 # them, and the PDF writer numbers objects in Go map order, so they churn
 # on every run. Artifacts, not goldens.
 driver/pdf/testdata_out/
+
+# Windows cross-builds: `GOOS=windows go build ./...` writes one beside each
+# main package in the module. Artifacts, never source.
+*.exe
