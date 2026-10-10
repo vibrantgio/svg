@@ -31,7 +31,7 @@ writer and of a scene graph. The root module's only dependencies are
 
 ## Where it sits
 
-Outside ADR-001's tier table — a support library the design system consumes and
+Outside the tier table — a support library the design system consumes and
 never depends on. The [organization page](https://github.com/vibrantgio) has the
 full tier table.
 
@@ -123,16 +123,10 @@ root's [`AGENTS.md`](https://github.com/vibrantgio/.github/blob/master/AGENTS.md
 
 Honest about what does not work yet. Every count below is measured.
 
-- **`fill-rule` used to be parsed backwards — fixed.** `parser/svgcursor.go:133`
-  set non-zero winding when the document asked for `evenodd`, and even-odd when
-  it asked for `nonzero` — inverted on both values, for any document that
-  *stated* a fill rule. The parser now keeps non-zero winding unless the
-  document states `evenodd`, matching the SVG initial value, and
-  `driver/raster`'s `TestFillRuleWinding` pins all three cases — `nonzero`,
-  `evenodd` and unstated — with a self-intersecting pentagram rendered through
-  a winding-aware scanner.
-- **The Gio driver ignores winding entirely**, which is why nothing in the
-  design system noticed the inverted parse while it was live.
+- **The Gio driver ignores winding entirely.** The parser keeps non-zero
+  winding unless the document states `evenodd`, matching the SVG initial
+  value, and `driver/raster`'s `TestFillRuleWinding` pins all three cases —
+  `nonzero`, `evenodd` and unstated. The Gio driver drops the flag:
   `driver/gio/driver.go:59` is
   `func (d *Driver) SetWinding(useNonZeroWinding bool) {}` — an empty body —
   because it paints through `clip.Outline`, which is non-zero only. The other
